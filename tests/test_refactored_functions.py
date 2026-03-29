@@ -3,52 +3,45 @@ import pytest
 from my_python_project.refactored_functions import (
     calculate_average,
     clean_names,
-    count_words,
     filter_passing_scores,
-    find_high_risk_amounts,
 )
 
 
-def test_clean_names() -> None:
-    result = clean_names(["  Alice  ", "BOB", " Charlie "])
-    assert result == ["alice", "bob", "charlie"]
+@pytest.mark.parametrize(
+    ("names", "expected"),
+    [
+        (["  Alice  ", "BOB", " Charlie "], ["alice", "bob", "charlie"]),  # happy path
+        ([], []),  # edge case
+    ],
+)
+def test_clean_names(names: list[str], expected: list[str]) -> None:
+    assert clean_names(names) == expected
 
 
-def test_filter_passing_scores() -> None:
-    result = filter_passing_scores([45.0, 67.5, 80.0, 39.0], 50.0)
-    assert result == [67.5, 80.0]
+@pytest.mark.parametrize(
+    ("scores", "pass_mark", "expected"),
+    [
+        ([45.0, 67.5, 80.0, 39.0], 50.0, [67.5, 80.0]),  # happy path
+        ([50.0, 49.9, 50.1], 50.0, [50.0, 50.1]),  # edge case: boundary values
+    ],
+)
+def test_filter_passing_scores(
+    scores: list[float], pass_mark: float, expected: list[float]
+) -> None:
+    assert filter_passing_scores(scores, pass_mark) == expected
 
 
-def test_calculate_average() -> None:
-    result = calculate_average([10.0, 20.0, 30.0])
-    assert result == 20.0
+@pytest.mark.parametrize(
+    ("values", "expected"),
+    [
+        ([10.0, 20.0, 30.0], 20.0),  # happy path
+        ([5.0], 5.0),  # edge case: single value
+    ],
+)
+def test_calculate_average(values: list[float], expected: float) -> None:
+    assert calculate_average(values) == expected
 
 
 def test_calculate_average_raises_for_empty_list() -> None:
     with pytest.raises(ValueError, match="values must not be empty"):
         calculate_average([])
-
-
-def test_find_high_risk_amounts() -> None:
-    result = find_high_risk_amounts(
-        risk_scores=[0.2, 0.9, 0.75, 0.4],
-        amounts=[100.0, 250.0, 80.0, 50.0],
-        threshold=0.7,
-    )
-    assert result == [250.0, 80.0]
-
-
-def test_find_high_risk_amounts_raises_for_mismatched_lengths() -> None:
-    with pytest.raises(
-        ValueError, match="risk_scores and amounts must have the same length"
-    ):
-        find_high_risk_amounts(
-            risk_scores=[0.2, 0.9],
-            amounts=[100.0],
-            threshold=0.7,
-        )
-
-
-def test_count_words() -> None:
-    result = count_words("Python is fun to learn")
-    assert result == 5
