@@ -13,4 +13,8 @@ repos:
     rev: v1.10.0
     hooks:
       - id: mypy
-        args: ["--strict"]
+        args: ["--strict", "src"]
+        pass_filenames: false
+        additional_dependencies:
+          - numpy
+          - pandas-stubs
